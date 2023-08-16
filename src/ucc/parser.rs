@@ -1,5 +1,3 @@
-use std::borrow::BorrowMut;
-
 use tracing::debug;
 
 use super::{
@@ -13,6 +11,7 @@ pub struct Parser {
     idx: usize,
 }
 
+// common
 impl Parser {
     pub fn new(tokens: Vec<Token>) -> Self {
         Self { tokens, idx: 0 }
@@ -58,7 +57,10 @@ impl Parser {
             return self.error("no token to expect");
         }
     }
+}
 
+// declarations
+impl Parser {
     fn is_type_specifier(&mut self) -> bool {
         if let Some(token) = self.cur_token() {
             match token.ty {
@@ -337,7 +339,7 @@ impl Parser {
                                 }));
                                 decl_type = match decl_type.as_mut() {
                                     Some(t) => {
-                                        self.fill_in_inner_type(t.borrow_mut(), func_ty)?;
+                                        self.fill_in_inner_type(t, func_ty)?;
                                         Some(t.clone())
                                     }
                                     None => Some(func_ty),
@@ -411,7 +413,10 @@ impl Parser {
             init: None,
         })))
     }
+}
 
+// api
+impl Parser {
     pub fn parse(&mut self) -> UccResult<Program> {
         let mut decls = vec![];
         while let Some(token) = self.cur_token() {

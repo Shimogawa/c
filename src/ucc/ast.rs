@@ -130,7 +130,7 @@ pub enum Decl {
 }
 
 #[derive(Clone, Debug)]
-pub enum ConstValue {
+pub enum ConstExpr {
     Int(i64),
     Float(f64),
     Char(char),
@@ -144,64 +144,122 @@ pub struct CallExpr {
 }
 
 #[derive(Clone, Debug)]
+pub struct ArrIdxExpr {
+    pub arr: Expr,
+    pub idx: Expr,
+}
+
+#[derive(Clone, Debug)]
+pub struct MemberAccessExpr {
+    pub obj: Expr,
+    pub ident: String,
+}
+
+#[derive(Clone, Debug)]
+pub struct UnaryExpr {
+    pub expr: Expr,
+}
+
+#[derive(Clone, Debug)]
+pub struct CastExpr {
+    pub expr: Expr,
+    pub to_type: Type,
+}
+
+#[derive(Clone, Debug)]
 pub struct BinaryExpr {
     pub lhs: Expr,
     pub rhs: Expr,
 }
 
 #[derive(Clone, Debug)]
+pub struct TernaryExpr {
+    pub cond: Expr,
+    pub then: Expr,
+    pub els: Expr,
+}
+
+#[derive(Clone, Debug)]
+pub struct AssignmentExpr {
+    pub dest: UnaryExpr,
+    pub value: Expr,
+}
+
+#[derive(Clone, Debug)]
+pub struct CommaExpr {
+    pub cur: Expr,
+    pub next: Expr,
+}
+
+#[derive(Clone, Debug)]
 pub enum ExprType {
+    // 1
     Var(String),
-    Const(Box<ConstValue>),
-    Call(Box<CallExpr>),
-    Cast,
-    Sizeof,
+    Const(ConstExpr),
+    Call(Box<CallExpr>),                    // ()
+    ArrIdx(Box<ArrIdxExpr>),                // []
+    MemberAccess(Box<MemberAccessExpr>),    // .
+    PtrMemberAccess(Box<MemberAccessExpr>), // ->
     // unary
-    PreInc,
-    PreDec,
-    PostInc,
-    PostDec,
-    Addr,
-    Deref,
-    UnaryPlus,
-    UnaryMinus,
-    Not,
-    BitNot,
+    // 2
+    Inc(Box<UnaryExpr>),        // ++
+    Dec(Box<UnaryExpr>),        // --
+    Addr(Box<UnaryExpr>),       // &
+    Deref(Box<UnaryExpr>),      // *
+    Sizeof(Box<UnaryExpr>),     // sizeof
+    UnaryPlus(Box<UnaryExpr>),  // +
+    UnaryMinus(Box<UnaryExpr>), // -
+    Not(Box<UnaryExpr>),        // !
+    BitNot(Box<UnaryExpr>),     // ~
+    Cast(Box<CastExpr>),        // (type)
     // binary
-    Mul,
-    Div,
-    Mod,
-    Add,
-    Sub,
-    LShift,
-    RShift,
-    Lt,
-    Gt,
-    Le,
-    Ge,
-    Eq,
-    Ne,
-    BitAnd,
-    BitXor,
-    BitOr,
-    And,
-    Or,
+    // 3
+    Mul(Box<BinaryExpr>), // *
+    Div(Box<BinaryExpr>), // /
+    Mod(Box<BinaryExpr>), // %
+    // 4
+    Add(Box<BinaryExpr>), // +
+    Sub(Box<BinaryExpr>), // -
+    // 5
+    LShift(Box<BinaryExpr>), // <<
+    RShift(Box<BinaryExpr>), // >>
+    // 6
+    Lt(Box<BinaryExpr>), // <
+    Gt(Box<BinaryExpr>), // >
+    Le(Box<BinaryExpr>), // <=
+    Ge(Box<BinaryExpr>), // >=
+    // 7
+    Eq(Box<BinaryExpr>), // ==
+    Ne(Box<BinaryExpr>), // !=
+    // 8
+    BitAnd(Box<BinaryExpr>), // &
+    // 9
+    BitXor(Box<BinaryExpr>), // ^
+    // 10
+    BitOr(Box<BinaryExpr>), // |
+    // 11
+    And(Box<BinaryExpr>), // &&
+    // 12
+    Or(Box<BinaryExpr>), // ||
     // ternary
-    Cond,
+    // 13
+    Cond(Box<TernaryExpr>), // ?:
     // assignment
-    Assign,
-    MulAssign,
-    DivAssign,
-    ModAssign,
-    AddAssign,
-    SubAssign,
-    LShiftAssign,
-    RShiftAssign,
-    BitAndAssign,
-    BitXorAssign,
-    BitOrAssign,
+    // 14
+    Assign(Box<AssignmentExpr>),       // =
+    MulAssign(Box<AssignmentExpr>),    // *=
+    DivAssign(Box<AssignmentExpr>),    // /=
+    ModAssign(Box<AssignmentExpr>),    // %=
+    AddAssign(Box<AssignmentExpr>),    // +=
+    SubAssign(Box<AssignmentExpr>),    // -=
+    LShiftAssign(Box<AssignmentExpr>), // <<=
+    RShiftAssign(Box<AssignmentExpr>), // >>=
+    BitAndAssign(Box<AssignmentExpr>), // &=
+    BitXorAssign(Box<AssignmentExpr>), // ^=
+    BitOrAssign(Box<AssignmentExpr>),  // |=
     // comma
-    Comma,
+    // 15
+    Comma(Box<CommaExpr>), // ,
 }
 
 #[derive(Clone, Debug)]
